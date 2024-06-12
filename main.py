@@ -1,6 +1,9 @@
 import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query
 from typing import Dict
+from langchain_pinecone import PineconeVectorStore
 
 from langchain.document_loaders import PyPDFLoader, Docx2txtLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -10,6 +13,8 @@ from langchain.chains import RetrievalQA
 from langchain_huggingface import HuggingFaceEndpoint
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel
+
+load_dotenv()
 
 
 class Query(BaseModel):
@@ -39,8 +44,11 @@ def initialize_doc_search(file_path: str):
         splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=20)
         docs = splitter.split_documents(pages)
         embeddings = HuggingFaceEmbeddings()
-
-        doc_search = Chroma.from_documents(docs, embeddings)
+        index_name = "trial"
+        doc_search = PineconeVectorStore.from_documents(docs, embeddings, index_name=index_name)
+        print(doc_search)
+        # vectorstore = PineconeVectorStore(index_name=index_name, embedding=embeddings)
+        # doc_search = vectorstore.from_documents(docs, embeddings)
         return doc_search
 
     except Exception as e:
