@@ -48,7 +48,7 @@ def initialize_doc_search(file_path: str):
 
 
 # Define the path to the document
-document_path = r"C:\Users\gurleen.kaur\Downloads\Int Switch User Manual.pdf"  # Change this to your document's path
+document_path = os.environ.get("DOCUMENT_PATH")  # Change this to your document's path
 
 # Initialize the document search on startup
 initialize_doc_search(document_path)
